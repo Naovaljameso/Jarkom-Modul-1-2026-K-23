@@ -436,7 +436,7 @@ Berbeda dari Telnet, SSH melakukan pertukaran kunci untuk membentuk session key.
 
 ## Nomor 14-20
 
-aszqx# NOMOR 14 — Analisis `wired_bruteforce.pcapng`
+NOMOR 14 — Analisis `wired_bruteforce.pcapng`
 
 ## Tujuan
 
