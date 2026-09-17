@@ -434,21 +434,895 @@ Berbeda dari Telnet, SSH melakukan pertukaran kunci untuk membentuk session key.
 
 </details>
 
-## Status Nomor 14-20
+## Nomor 14-20
 
-Berkas soal memuat nomor 14-20, tetapi folder `assets` dan project GNS3 yang tersedia belum memuat screenshot atau hasil analisis untuk bagian ini.
+aszqx# NOMOR 14 — Analisis `wired_bruteforce.pcapng`
 
-| No. | Analisis yang Diminta                                 | Status Dokumentasi |
-| --: | ----------------------------------------------------- | ------------------ |
-|  14 | HTTP brute-force pada `wired_bruteforce.pcapng`       | Belum ada bukti    |
-|  15 | USB HID pada `wired_usb_hid.pcap`                     | Belum ada bukti    |
-|  16 | FTP malware theft pada `wired_ftp_theft.pcap`         | Belum ada bukti    |
-|  17 | HTTP C2 pada `wired_http_c2.pcap`                     | Belum ada bukti    |
-|  18 | Transfer malware SMB pada `wired_smb_transfer.pcapng` | Belum ada bukti    |
-|  19 | Email ancaman SMTP pada `wired_smtp_threat.pcap`      | Belum ada bukti    |
-|  20 | Dekripsi TLS pada `wired_tls_decrypt.pcapng`          | Belum ada bukti    |
+## Tujuan
 
-Bagian tersebut dapat ditambahkan setelah file capture, hasil validasi socket, dan screenshot Wireshark tersedia.
+Mencari:
+
+1. IP penyerang
+2. IP target
+3. Port yang diserang
+4. Password user `lain_admin`
+5. Web server software dan versinya pada response header
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+Buka Wireshark:
+
+```text
+File → Open
+```
+
+Pilih:
+
+```text
+wired_bruteforce.pcapng
+```
+
+### 2. Cari trafik HTTP
+
+Pada kolom Display Filter:
+
+```text
+http
+```
+
+Tekan **Enter**.
+
+### 3. Cari request login
+
+Gunakan filter:
+
+```text
+http.request.method == "POST"
+```
+
+Cari request yang berhubungan dengan login.
+
+### 4. Tentukan IP penyerang
+
+Klik paket login dan lihat bagian:
+
+```text
+Internet Protocol Version 4
+```
+
+Perhatikan:
+
+```text
+Source
+Destination
+```
+
+IP pada `Source` dicatat sebagai IP penyerang.
+
+```text
+IP Penyerang : [hasil dari PCAP]
+```
+
+### 5. Tentukan IP target dan port
+
+Pada paket yang sama lihat:
+
+```text
+Destination
+TCP Destination Port
+```
+
+Catat:
+
+```text
+IP Target : [hasil dari PCAP]
+Port Target : [hasil dari PCAP]
+```
+
+### 6. Cari password `lain_admin`
+
+Klik kanan paket login:
+
+```text
+Follow → HTTP Stream
+```
+
+Cari username:
+
+```text
+lain_admin
+```
+
+Kemudian cari password pada request tersebut.
+
+Catat:
+
+```text
+Username : lain_admin
+Password : [hasil dari PCAP]
+```
+
+### 7. Cari web server software dan versi
+
+Cari HTTP response dari server.
+
+Buka:
+
+```text
+HTTP Response
+→ Response Headers
+```
+
+Cari field:
+
+```text
+Server:
+```
+
+Catat:
+
+```text
+Web Server : [hasil dari PCAP]
+Versi : [hasil dari PCAP]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3401
+```
+
+Masukkan jawaban sesuai format yang diminta socket.
+
+## Dokumentasi
+
+Screenshot yang disarankan:
+
+- Paket login yang menunjukkan Source, Destination, dan port.
+- HTTP Stream yang menunjukkan username dan password.
+- Response header yang menunjukkan `Server`.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 15 — Analisis `wired_usb_hid.pcap`
+
+## Tujuan
+
+Mencari:
+
+1. Vendor ID
+2. Product ID
+3. USB device address
+4. Pesan rahasia dari keystroke
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+```text
+File → Open → wired_usb_hid.pcap
+```
+
+### 2. Tampilkan trafik USB
+
+Gunakan Display Filter:
+
+```text
+usb
+```
+
+### 3. Cari Device Descriptor
+
+Cari paket yang berhubungan dengan:
+
+```text
+Device Descriptor
+```
+
+Buka bagian USB dan cari:
+
+```text
+idVendor
+idProduct
+```
+
+Catat:
+
+```text
+Vendor ID : [hasil dari PCAP]
+Product ID : [hasil dari PCAP]
+```
+
+### 4. Cari USB Device Address
+
+Masih pada detail USB, cari alamat device.
+
+```text
+USB Device Address : [hasil dari PCAP]
+```
+
+### 5. Cari paket HID keyboard
+
+Cari paket yang berisi data keyboard/HID.
+
+Perhatikan field seperti:
+
+```text
+USB HID Data
+usb.capdata
+```
+
+### 6. Rekonstruksi keystroke
+
+Periksa paket keyboard secara berurutan dan cocokkan kode tombol dengan karakter yang diketik sampai membentuk pesan.
+
+Catat:
+
+```text
+Pesan Rahasia : [hasil decoding]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3402
+```
+
+Masukkan:
+
+```text
+Vendor ID
+Product ID
+USB Device Address
+Pesan Rahasia
+```
+
+sesuai urutan yang diminta socket.
+
+## Dokumentasi
+
+Screenshot:
+
+- Device Descriptor.
+- Vendor ID dan Product ID.
+- USB device address.
+- Paket HID keyboard.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 16 — Analisis `wired_ftp_theft.pcap`
+
+## Tujuan
+
+Mencari:
+
+1. IP server FTP penyerang
+2. Banner software FTP
+3. Username login
+4. Password login
+5. Ukuran file `knights_payload.exe`
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+```text
+File → Open → wired_ftp_theft.pcap
+```
+
+### 2. Filter FTP
+
+```text
+ftp
+```
+
+### 3. Cari banner server
+
+Cari response awal server, biasanya response dengan kode:
+
+```text
+220
+```
+
+Catat:
+
+```text
+FTP Server IP : [hasil dari PCAP]
+FTP Banner : [hasil dari PCAP]
+```
+
+### 4. Cari username
+
+Cari command:
+
+```text
+USER
+```
+
+Catat:
+
+```text
+Username : [hasil dari PCAP]
+```
+
+### 5. Cari password
+
+Cari command:
+
+```text
+PASS
+```
+
+Catat:
+
+```text
+Password : [hasil dari PCAP]
+```
+
+### 6. Cari file malware
+
+Cari command:
+
+```text
+RETR knights_payload.exe
+```
+
+`RETR` menunjukkan proses download file.
+
+### 7. Cari ukuran file
+
+Periksa informasi ukuran file pada trafik FTP.
+
+Catat:
+
+```text
+File : knights_payload.exe
+Size : [jumlah bytes]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3403
+```
+
+Masukkan jawaban sesuai format socket.
+
+## Dokumentasi
+
+Screenshot:
+
+- Banner FTP.
+- Command `USER`.
+- Command `PASS`.
+- `RETR knights_payload.exe`.
+- Informasi ukuran file.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 17 — Analisis `wired_http_c2.pcap`
+
+## Tujuan
+
+Mencari:
+
+1. Host/domain tempat malware diunduh
+2. IP server penyerang
+3. Nama file executable malware
+4. HTTP status code
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+```text
+File → Open → wired_http_c2.pcap
+```
+
+### 2. Filter HTTP
+
+```text
+http
+```
+
+### 3. Cari HTTP Request
+
+Cari request yang melakukan download.
+
+Buka:
+
+```text
+Hypertext Transfer Protocol
+```
+
+Cari:
+
+```text
+Host:
+```
+
+Catat:
+
+```text
+Host/Domain : [hasil dari PCAP]
+```
+
+### 4. Tentukan IP server penyerang
+
+Lihat:
+
+```text
+Destination
+```
+
+Catat:
+
+```text
+IP Server Penyerang : [hasil dari PCAP]
+```
+
+### 5. Tentukan nama file executable
+
+Periksa:
+
+```text
+Request URI
+```
+
+Contoh bentuk:
+
+```text
+GET /files/nama.exe HTTP/1.1
+```
+
+Ambil nama executable dari URI.
+
+```text
+Executable : [hasil dari PCAP]
+```
+
+### 6. Cari HTTP Status Code
+
+Cari response dari server dan perhatikan:
+
+```text
+HTTP/1.1 xxx
+```
+
+Catat:
+
+```text
+Status Code : [hasil dari PCAP]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3404
+```
+
+Masukkan jawaban sesuai format socket.
+
+## Dokumentasi
+
+Screenshot:
+
+- HTTP request.
+- `Host`.
+- Destination IP.
+- Request URI.
+- HTTP status code.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 18 — Analisis `wired_smb_transfer.pcapng`
+
+## Tujuan
+
+Mencari:
+
+1. Protokol jaringan yang dieksploitasi
+2. IP pengirim
+3. IP penerima
+4. Folder tujuan penyimpanan malware
+5. Nama file executable malware
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+```text
+File → Open → wired_smb_transfer.pcapng
+```
+
+### 2. Filter SMB
+
+Coba:
+
+```text
+smb
+```
+
+Jika capture menggunakan SMB2:
+
+```text
+smb2
+```
+
+### 3. Tentukan protokol
+
+Lihat nama protokol pada Packet List/Packet Details.
+
+Catat:
+
+```text
+Protocol : [hasil dari PCAP]
+```
+
+### 4. Tentukan IP pengirim dan penerima
+
+Lihat:
+
+```text
+Source
+Destination
+```
+
+Catat:
+
+```text
+IP Pengirim : [hasil dari PCAP]
+IP Penerima : [hasil dari PCAP]
+```
+
+### 5. Cari folder tujuan
+
+Perhatikan paket yang berhubungan dengan:
+
+```text
+Tree Connect
+Create Request
+```
+
+Cari path/folder tempat file akan disimpan.
+
+Catat:
+
+```text
+Folder Tujuan : [hasil dari PCAP]
+```
+
+### 6. Cari nama file executable
+
+Pada `Create Request` atau data transfer, cari file dengan ekstensi:
+
+```text
+.exe
+```
+
+Catat:
+
+```text
+Nama Malware : [hasil dari PCAP]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3405
+```
+
+Masukkan jawaban sesuai urutan yang diminta socket.
+
+## Dokumentasi
+
+Screenshot:
+
+- Paket SMB/SMB2.
+- Source dan Destination IP.
+- Folder/path tujuan.
+- Nama file executable.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 19 — Analisis `wired_smtp_threat.pcap`
+
+## Tujuan
+
+Mencari:
+
+1. Alamat email korban
+2. Password korban yang diklaim bocor
+3. Jenis malware
+4. Batas waktu dalam hari
+5. MailClientID
+
+## Langkah Pengerjaan
+
+### 1. Buka file PCAP
+
+```text
+File → Open → wired_smtp_threat.pcap
+```
+
+### 2. Filter SMTP
+
+```text
+smtp
+```
+
+### 3. Gunakan Follow TCP Stream
+
+Klik kanan paket SMTP:
+
+```text
+Follow → TCP Stream
+```
+
+### 4. Cari email korban
+
+Cari command:
+
+```text
+RCPT TO:
+```
+
+Alamat setelah command tersebut adalah alamat email korban.
+
+```text
+Email Korban : [hasil dari PCAP]
+```
+
+### 5. Cari password yang diklaim bocor
+
+Setelah:
+
+```text
+DATA
+```
+
+akan terlihat isi email.
+
+Cari bagian yang menyebut password.
+
+```text
+Password : [hasil dari PCAP]
+```
+
+### 6. Cari jenis malware
+
+Masih pada isi email, cari penyebutan jenis malware.
+
+```text
+Jenis Malware : [hasil dari PCAP]
+```
+
+### 7. Cari batas waktu
+
+Cari kalimat yang menyebut deadline/batas waktu.
+
+Catat jumlah hari:
+
+```text
+Deadline : [jumlah hari]
+```
+
+### 8. Cari MailClientID
+
+Cari teks:
+
+```text
+MailClientID
+```
+
+Catat:
+
+```text
+MailClientID : [hasil dari PCAP]
+```
+
+## Validasi Socket
+
+```bash
+nc [IP_Group] 3406
+```
+
+Masukkan seluruh jawaban sesuai format socket.
+
+## Dokumentasi
+
+Screenshot:
+
+- `RCPT TO`.
+- Isi email pada TCP Stream.
+- Password.
+- Jenis malware.
+- Deadline.
+- MailClientID.
+- Hasil validasi socket.
+
+---
+
+# NOMOR 20 — Analisis `wired_tls_decrypt.pcapng`
+
+## File yang digunakan
+
+```text
+wired_tls_decrypt.pcapng
+keyslogfile.txt
+```
+
+## Tujuan
+
+Mencari:
+
+1. Versi TLS yang dinegosiasikan
+2. SNI/domain
+3. IP server HTTPS penyerang
+4. User-Agent
+5. HTTP request method
+6. HTTP request path
+
+## Langkah Pengerjaan
+
+### 1. Masukkan keylog ke Wireshark
+
+Buka:
+
+```text
+Edit → Preferences
+```
+
+Kemudian:
+
+```text
+Protocols → TLS
+```
+
+Cari:
+
+```text
+(Pre)-Master-Secret log filename
+```
+
+Arahkan ke:
+
+```text
+keyslogfile.txt
+```
+
+### 2. Buka PCAP
+
+```text
+File → Open → wired_tls_decrypt.pcapng
+```
+
+### 3. Cari TLS Handshake
+
+Gunakan:
+
+```text
+tls
+```
+
+Cari:
+
+```text
+Client Hello
+Server Hello
+```
+
+### 4. Cari versi TLS
+
+Klik `Server Hello`.
+
+Cari versi protokol TLS yang digunakan.
+
+```text
+TLS Version : [hasil dari PCAP]
+```
+
+### 5. Cari SNI
+
+Klik `Client Hello`.
+
+Buka:
+
+```text
+Extensions
+→ Server Name
+```
+
+Catat:
+
+```text
+SNI : [hasil dari PCAP]
+```
+
+### 6. Cari IP server HTTPS
+
+Perhatikan:
+
+```text
+Destination
+```
+
+pada koneksi HTTPS tersebut.
+
+Catat:
+
+```text
+IP Server HTTPS : [hasil dari PCAP]
+```
+
+### 7. Cari HTTP hasil dekripsi
+
+Setelah keylog berhasil digunakan, cari trafik HTTP yang sudah dapat dibaca.
+
+Gunakan:
+
+```text
+http
+```
+
+### 8. Cari User-Agent
+
+Pada HTTP request cari:
+
+```text
+User-Agent:
+```
+
+Catat:
+
+```text
+User-Agent : [hasil dari PCAP]
+```
+
+### 9. Cari HTTP Method
+
+Lihat request line.
+
+Contoh:
+
+```text
+GET /xxxx HTTP/1.1
+```
+
+atau:
+
+```text
+POST /xxxx HTTP/1.1
+```
+
+Catat:
+
+```text
+Method : [GET/POST/dll.]
+```
+
+### 10. Cari request path
+
+Pada request line, ambil bagian setelah method.
+
+Contoh:
+
+```text
+GET /malware/payload.exe HTTP/1.1
+```
+
+Maka:
+
+```text
+Path : /malware/payload.exe
+```
 
 ## Kesimpulan
 
