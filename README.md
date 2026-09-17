@@ -67,21 +67,23 @@ Router Lain memiliki satu interface ke NAT GNS3 dan tiga interface sebagai gatew
 
 ## Ringkasan Hasil
 
-| No. | Pengujian                     | Hasil                                                            |
-| --: | ----------------------------- | ---------------------------------------------------------------- | ----- | ---------------------------- |
-|   1 | Topologi dan IP statis        | Berhasil, tiga subnet dan lima client terkonfigurasi             |
-|   2 | DHCP/NAT pada `eth0` router   | Berhasil, router memperoleh IP dan dapat mengakses `8.8.8.8`     |
-|   3 | Routing antar-subnet          | Berhasil, komunikasi antarsegmen tanpa packet loss               |
-|   4 | NAT masquerade dan DNS        | Berhasil pada seluruh client                                     |
-|   5 | Persistensi setelah restart   | Interface, route, NAT, dan konektivitas tetap aktif              |
-|   6 | Filter Wireshark `dns         |                                                                  | icmp` | 48 dari 52 paket ditampilkan |
-|   7 | Hak akses FTP                 | Alice read-write, Mika read-only, Eiri ditolak                   |
-|   8 | Upload FTP dari Knights       | `STOR`, respons `226`, port PASV `17964`                         |
-|   9 | Akses FTP Mika                | Download berhasil, upload ditolak dengan `550 Permission denied` |
-|  10 | Ping 77 paket                 | 0% packet loss; RTT `0.437/0.570/1.090 ms`                       |
-|  11 | Analisis Telnet               | Kredensial terlihat plaintext; data karakter berukuran 1 byte    |
-|  12 | Pemindaian Netcat             | Port 22/80 terbuka, port 7777 tertutup                           |
-|  13 | SSH public-key authentication | Login tanpa password berhasil dan payload sesi terenkripsi       |
+## Ringkasan Hasil
+
+| No. | Pengujian                        | Hasil                                                            |
+| --: | -------------------------------- | ---------------------------------------------------------------- |
+|   1 | Topologi dan IP statis           | Berhasil, tiga subnet dan lima client terkonfigurasi             |
+|   2 | DHCP/NAT pada `eth0` router      | Berhasil, router memperoleh IP dan dapat mengakses `8.8.8.8`     |
+|   3 | Routing antar-subnet             | Berhasil, komunikasi antarsegmen tanpa packet loss               |
+|   4 | NAT masquerade dan DNS           | Berhasil pada seluruh client                                     |
+|   5 | Persistensi setelah restart      | Interface, route, NAT, dan konektivitas tetap aktif              |
+|   6 | Filter Wireshark `dns \|\| icmp` | 48 dari 52 paket ditampilkan                                     |
+|   7 | Hak akses FTP                    | Alice read-write, Mika read-only, Eiri ditolak                   |
+|   8 | Upload FTP dari Knights          | `STOR`, respons `226`, port PASV `17964`                         |
+|   9 | Akses FTP Mika                   | Download berhasil, upload ditolak dengan `550 Permission denied` |
+|  10 | Ping 77 paket                    | 0% packet loss; RTT `0.437/0.570/1.090 ms`                       |
+|  11 | Analisis Telnet                  | Kredensial terlihat plaintext; data karakter berukuran 1 byte    |
+|  12 | Pemindaian Netcat                | Port 22/80 terbuka, port 7777 tertutup                           |
+|  13 | SSH public-key authentication    | Login tanpa password berhasil dan payload sesi terenkripsi       |
 
 ## Dokumentasi Pengerjaan
 
